@@ -9,8 +9,8 @@
   } from "$env/static/public";
   import { writable } from "svelte/store";
   import { onMount } from "svelte";
-  import appwriteSvg from "../../static/appwrite-icon.svg";
-  import svelteSvg from "../../static/svelte.svg";
+  const appwriteSvg = "/appwrite-icon.svg?url";
+  const svelteSvg = "/svelte.svg?url";
 
   let detailHeight = writable(0);
 
