@@ -1,12 +1,11 @@
-<!-- src/lib/components/Footer.svelte -->
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { authStore } from '$lib/stores/auth';
   
-  // Svelte animations and transitions
+  // Svelte animations
   import { fly, fade, scale } from 'svelte/transition';
-  import { quartOut, backOut, bounceOut } from 'svelte/easing';
+  import { quartOut, bounceOut } from 'svelte/easing';
   
+  // Icons
   import { 
     Sparkles, 
     Mail, 
@@ -20,8 +19,6 @@
   
   let mounted = false;
   let showScrollTop = false;
-  
-  $: isAuthenticated = $authStore.isAuthenticated;
   
   onMount(() => {
     mounted = true;
@@ -68,7 +65,7 @@
   
   const socialLinks = [
     { name: 'Twitter', icon: Twitter, href: 'https://twitter.com/focusflow', color: 'hover:text-blue-400' },
-    { name: 'GitHub', icon: Github, href: 'https://github.com/focusflow', color: 'hover:text-surface-900 dark:hover:text-white' },
+    { name: 'GitHub', icon: Github, href: 'https://github.com/focusflow', color: 'hover:text-gray-900 dark:hover:text-white' },
     { name: 'LinkedIn', icon: Linkedin, href: 'https://linkedin.com/company/focusflow', color: 'hover:text-blue-600' },
     { name: 'Email', icon: Mail, href: 'mailto:hello@focusflow.com', color: 'hover:text-rose-500' }
   ];
@@ -77,7 +74,7 @@
 <!-- Scroll to Top Button -->
 {#if showScrollTop}
   <button
-    class="fixed bottom-6 right-6 z-50 btn variant-filled-rose w-12 h-12 !p-0 rounded-full shadow-elegant-lg hover:shadow-rose-glow group"
+    class="scroll-top-btn group"
     on:click={scrollToTop}
     in:scale={{ duration: 300, easing: bounceOut }}
     out:scale={{ duration: 200 }}
@@ -87,7 +84,7 @@
 {/if}
 
 <!-- Main Footer -->
-<footer class="bg-surface-100 dark:bg-surface-800 border-t border-surface-200 dark:border-surface-700">
+<footer class="bg-gray-100 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
   {#if mounted}
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       
@@ -102,17 +99,17 @@
           >
             <!-- Logo -->
             <div class="flex items-center space-x-3">
-              <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-rose shadow-sm">
+              <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500 to-rose-600 shadow-sm">
                 <Sparkles class="w-6 h-6 text-white" strokeWidth={2.5} />
               </div>
               <div>
-                <h3 class="text-xl font-display font-bold text-gradient-rose">FocusFlow</h3>
-                <p class="text-xs text-surface-500 dark:text-surface-400 -mt-1">Productivity Suite</p>
+                <h3 class="text-xl font-bold bg-gradient-to-r from-rose-600 to-rose-500 bg-clip-text text-transparent">FocusFlow</h3>
+                <p class="text-xs text-gray-500 dark:text-gray-400 -mt-1">Productivity Suite</p>
               </div>
             </div>
             
             <!-- Description -->
-            <p class="text-surface-600 dark:text-surface-300 leading-relaxed max-w-sm">
+            <p class="text-gray-600 dark:text-gray-300 leading-relaxed max-w-sm">
               The ultimate productivity suite that helps you manage tasks, schedule events, 
               and stay focused on what matters most.
             </p>
@@ -124,7 +121,7 @@
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="p-2 rounded-lg bg-surface-200 dark:bg-surface-700 text-surface-600 dark:text-surface-300 {social.color} transition-all duration-200 hover:scale-110 hover:shadow-sm"
+                  class="social-link {social.color}"
                   in:scale={{ duration: 300, delay: 200 + (i * 100), easing: bounceOut }}
                 >
                   <svelte:component this={social.icon} class="w-5 h-5" />
@@ -139,16 +136,11 @@
             class="space-y-4"
             in:fly={{ y: 30, duration: 600, delay: 200, easing: quartOut }}
           >
-            <h4 class="text-sm font-semibold text-surface-900 dark:text-surface-50 uppercase tracking-wider">
-              Product
-            </h4>
+            <h4 class="footer-heading">Product</h4>
             <ul class="space-y-3">
               {#each footerLinks.product as link, i}
                 <li in:fly={{ x: -10, duration: 300, delay: 300 + (i * 50), easing: quartOut }}>
-                  <a 
-                    href={link.href}
-                    class="text-surface-600 dark:text-surface-300 hover:text-rose-600 dark:hover:text-rose-400 transition-colors duration-200 text-sm hover:translate-x-1 inline-block transition-transform"
-                  >
+                  <a href={link.href} class="footer-link">
                     {link.name}
                   </a>
                 </li>
@@ -161,16 +153,11 @@
             class="space-y-4"
             in:fly={{ y: 30, duration: 600, delay: 250, easing: quartOut }}
           >
-            <h4 class="text-sm font-semibold text-surface-900 dark:text-surface-50 uppercase tracking-wider">
-              Company
-            </h4>
+            <h4 class="footer-heading">Company</h4>
             <ul class="space-y-3">
               {#each footerLinks.company as link, i}
                 <li in:fly={{ x: -10, duration: 300, delay: 350 + (i * 50), easing: quartOut }}>
-                  <a 
-                    href={link.href}
-                    class="text-surface-600 dark:text-surface-300 hover:text-rose-600 dark:hover:text-rose-400 transition-colors duration-200 text-sm hover:translate-x-1 inline-block transition-transform"
-                  >
+                  <a href={link.href} class="footer-link">
                     {link.name}
                   </a>
                 </li>
@@ -183,16 +170,11 @@
             class="space-y-4"
             in:fly={{ y: 30, duration: 600, delay: 300, easing: quartOut }}
           >
-            <h4 class="text-sm font-semibold text-surface-900 dark:text-surface-50 uppercase tracking-wider">
-              Support
-            </h4>
+            <h4 class="footer-heading">Support</h4>
             <ul class="space-y-3">
               {#each footerLinks.support as link, i}
                 <li in:fly={{ x: -10, duration: 300, delay: 400 + (i * 50), easing: quartOut }}>
-                  <a 
-                    href={link.href}
-                    class="text-surface-600 dark:text-surface-300 hover:text-rose-600 dark:hover:text-rose-400 transition-colors duration-200 text-sm hover:translate-x-1 inline-block transition-transform flex items-center space-x-1"
-                  >
+                  <a href={link.href} class="footer-link footer-external">
                     <span>{link.name}</span>
                     {#if link.href.startsWith('http')}
                       <ExternalLink class="w-3 h-3 opacity-50" />
@@ -208,16 +190,11 @@
             class="space-y-4"
             in:fly={{ y: 30, duration: 600, delay: 350, easing: quartOut }}
           >
-            <h4 class="text-sm font-semibold text-surface-900 dark:text-surface-50 uppercase tracking-wider">
-              Legal
-            </h4>
+            <h4 class="footer-heading">Legal</h4>
             <ul class="space-y-3">
               {#each footerLinks.legal as link, i}
                 <li in:fly={{ x: -10, duration: 300, delay: 450 + (i * 50), easing: quartOut }}>
-                  <a 
-                    href={link.href}
-                    class="text-surface-600 dark:text-surface-300 hover:text-rose-600 dark:hover:text-rose-400 transition-colors duration-200 text-sm hover:translate-x-1 inline-block transition-transform"
-                  >
+                  <a href={link.href} class="footer-link">
                     {link.name}
                   </a>
                 </li>
@@ -227,53 +204,51 @@
         </div>
       </div>
       
-      <!-- Newsletter Section (only for anonymous users) -->
-      {#if !isAuthenticated}
-        <div 
-          class="py-8 border-t border-surface-200 dark:border-surface-700"
-          in:fade={{ duration: 600, delay: 600 }}
-        >
-          <div class="max-w-md mx-auto text-center space-y-4">
-            <h4 class="text-lg font-semibold text-surface-900 dark:text-surface-50">
-              Stay updated
-            </h4>
-            <p class="text-surface-600 dark:text-surface-300 text-sm">
-              Get the latest productivity tips and product updates delivered to your inbox.
-            </p>
-            <div class="flex space-x-2">
-              <input 
-                type="email" 
-                placeholder="Enter your email"
-                class="flex-1 px-4 py-2 bg-surface-200 dark:bg-surface-700 border border-surface-300 dark:border-surface-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all duration-200"
-              />
-              <button class="btn variant-filled-rose px-6 hover:scale-105 transition-transform duration-200">
-                Subscribe
-              </button>
-            </div>
+      <!-- Newsletter Section -->
+      <div 
+        class="py-8 border-t border-gray-200 dark:border-gray-700"
+        in:fade={{ duration: 600, delay: 600 }}
+      >
+        <div class="max-w-md mx-auto text-center space-y-4">
+          <h4 class="text-lg font-semibold text-gray-900 dark:text-white">
+            Stay updated
+          </h4>
+          <p class="text-gray-600 dark:text-gray-300 text-sm">
+            Get the latest productivity tips and product updates delivered to your inbox.
+          </p>
+          <div class="flex space-x-2">
+            <input 
+              type="email" 
+              placeholder="Enter your email"
+              class="newsletter-input"
+            />
+            <button class="newsletter-btn">
+              Subscribe
+            </button>
           </div>
         </div>
-      {/if}
+      </div>
       
       <!-- Bottom Bar -->
       <div 
-        class="py-6 border-t border-surface-200 dark:border-surface-700"
-        in:slide={{ duration: 600, delay: 700, easing: quartOut }}
+        class="py-6 border-t border-gray-200 dark:border-gray-700"
+        in:fly={{ y: 20, duration: 600, delay: 700, easing: quartOut }}
       >
         <div class="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
-          <div class="flex items-center space-x-2 text-sm text-surface-500 dark:text-surface-400">
+          <div class="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
             <span>© 2024 FocusFlow. All rights reserved.</span>
             <span class="hidden md:inline">•</span>
             <span class="hidden md:inline">Made with</span>
-            <Heart class="hidden md:inline w-4 h-4 text-rose-500 fill-current animate-pulse-gentle" />
+            <Heart class="hidden md:inline w-4 h-4 text-rose-500 fill-current animate-pulse" />
             <span class="hidden md:inline">for productivity enthusiasts</span>
           </div>
           
           <div class="flex items-center space-x-6 text-sm">
-            <div class="flex items-center space-x-2 text-surface-500 dark:text-surface-400">
+            <div class="flex items-center space-x-2 text-gray-500 dark:text-gray-400">
               <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
               <span>All systems operational</span>
             </div>
-            <div class="text-surface-500 dark:text-surface-400">
+            <div class="text-gray-500 dark:text-gray-400">
               Version 2.1.0
             </div>
           </div>
@@ -284,25 +259,5 @@
 </footer>
 
 <style>
-  /* Custom animations for footer elements */
-  :global(.animate-pulse-gentle) {
-    animation: pulseGentle 3s ease-in-out infinite;
-  }
-  
-  @keyframes pulseGentle {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.7; }
-  }
-  
-  /* Hover effect for footer links */
-  footer a:hover {
-    transform: translateX(2px);
-  }
-  
-  /* Smooth transitions for all interactive elements */
-  footer button,
-  footer input,
-  footer a {
-    transition: all 0.2s ease;
-  }
+
 </style>

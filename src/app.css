@@ -333,3 +333,75 @@ body {
     print-color-adjust: exact;
   }
 }
+
+  .scroll-top-btn {
+    @apply fixed  z-50 rounded-full;
+    @apply bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700;
+    @apply text-white transition-all duration-300 hover:shadow-xl;
+    @apply flex items-center justify-center;
+  }
+  /* Scroll to Top Button */
+
+  /* Social Links */
+  .social-link {
+    @apply p-2 rounded-lg transition-all duration-200 hover:scale-110 hover:shadow-sm;
+    @apply bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300;
+  }
+
+  /* Footer Headings */
+  .footer-heading {
+    @apply text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider;
+  }
+
+  /* Footer Links */
+  .footer-link {
+    @apply text-gray-600 dark:text-gray-300 hover:text-rose-600 dark:hover:text-rose-400;
+    @apply transition-all duration-200 text-sm hover:translate-x-1 inline-block;
+  }
+
+  .footer-external {
+    @apply flex items-center space-x-1;
+  }
+
+  /* Newsletter Input */
+  .newsletter-input {
+    @apply flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 border border-gray-300 dark:border-gray-600;
+    @apply rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent;
+    @apply transition-all duration-200 text-gray-900 dark:text-white;
+  }
+
+  /* Newsletter Button */
+  .newsletter-btn {
+    @apply px-6 py-2 bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700;
+    @apply text-white font-medium rounded-lg shadow-lg hover:shadow-xl;
+    @apply transition-all duration-200 hover:scale-105;
+  }
+
+  /* Gradient text */
+  .bg-clip-text {
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* Smooth transitions */
+  footer button,
+  footer input,
+  footer a {
+    transition: all 0.2s ease;
+  }
+
+  /* Hover effects */
+  footer a:hover {
+    transform: translateX(2px);
+  }
+
+  /* Custom animations */
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+
+  .animate-pulse {
+    animation: pulse 3s ease-in-out infinite;
+  }
