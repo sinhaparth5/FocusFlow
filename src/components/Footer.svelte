@@ -1,263 +1,195 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { fly } from 'svelte/transition';
+  import { quintOut } from 'svelte/easing';
   
-  // Svelte animations
-  import { fly, fade, scale } from 'svelte/transition';
-  import { quartOut, bounceOut } from 'svelte/easing';
+  let email = '';
+  let isSubmitting = false;
+  let submitMessage = '';
   
-  // Icons
-  import { 
-    Sparkles, 
-    Mail, 
-    Twitter, 
-    Github, 
-    Linkedin,
-    ArrowUp,
-    Heart,
-    ExternalLink
-  } from 'lucide-svelte';
+  const currentYear = new Date().getFullYear();
   
-  let mounted = false;
-  let showScrollTop = false;
+  const companyLinks = [
+    { name: 'About', href: '/about' },
+    { name: 'Careers', href: '/careers' },
+    { name: 'Contact', href: '/contact' },
+    { name: 'Blog', href: '/blog' }
+  ];
   
-  onMount(() => {
-    mounted = true;
-    
-    // Show/hide scroll to top button
-    const handleScroll = () => {
-      showScrollTop = window.scrollY > 500;
-    };
-    
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  });
+  const productLinks = [
+    { name: 'Features', href: '/features' },
+    { name: 'Pricing', href: '/pricing' },
+    { name: 'Integrations', href: '/integrations' },
+    { name: 'API', href: '/api' }
+  ];
   
-  function scrollToTop() {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
+  const supportLinks = [
+    { name: 'Help Center', href: '/help' },
+    { name: 'Documentation', href: '/docs' },
+    { name: 'Community', href: '/community' },
+    { name: 'Status', href: '/status' }
+  ];
   
-  const footerLinks = {
-    product: [
-      { name: 'Features', href: '/#features' },
-      { name: 'Pricing', href: '/#pricing' },
-      { name: 'Integrations', href: '/integrations' },
-      { name: 'API', href: '/api' }
-    ],
-    company: [
-      { name: 'About', href: '/about' },
-      { name: 'Blog', href: '/blog' },
-      { name: 'Careers', href: '/careers' },
-      { name: 'Contact', href: '/contact' }
-    ],
-    support: [
-      { name: 'Help Center', href: '/help' },
-      { name: 'Documentation', href: '/docs' },
-      { name: 'Status', href: '/status' },
-      { name: 'Community', href: '/community' }
-    ],
-    legal: [
-      { name: 'Privacy', href: '/privacy' },
-      { name: 'Terms', href: '/terms' },
-      { name: 'Security', href: '/security' },
-      { name: 'Cookies', href: '/cookies' }
-    ]
-  };
+  const legalLinks = [
+    { name: 'Privacy Policy', href: '/privacy' },
+    { name: 'Terms of Service', href: '/terms' },
+    { name: 'Cookie Policy', href: '/cookies' }
+  ];
   
   const socialLinks = [
-    { name: 'Twitter', icon: Twitter, href: 'https://twitter.com/focusflow', color: 'hover:text-blue-400' },
-    { name: 'GitHub', icon: Github, href: 'https://github.com/focusflow', color: 'hover:text-gray-900 dark:hover:text-white' },
-    { name: 'LinkedIn', icon: Linkedin, href: 'https://linkedin.com/company/focusflow', color: 'hover:text-blue-600' },
-    { name: 'Email', icon: Mail, href: 'mailto:hello@focusflow.com', color: 'hover:text-rose-500' }
+    { name: 'Twitter', href: 'https://twitter.com', icon: '🐦' },
+    { name: 'LinkedIn', href: 'https://linkedin.com', icon: '💼' },
+    { name: 'GitHub', href: 'https://github.com', icon: '💻' },
+    { name: 'Discord', href: 'https://discord.com', icon: '💬' }
   ];
+  
+  async function handleNewsletterSubmit(event: Event) {
+    event.preventDefault();
+    
+    if (!email || isSubmitting) return;
+    
+    isSubmitting = true;
+    
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      submitMessage = 'Thank you for subscribing!';
+      email = '';
+    } catch (error) {
+      submitMessage = 'Something went wrong. Please try again.';
+    } finally {
+      isSubmitting = false;
+      setTimeout(() => {
+        submitMessage = '';
+      }, 3000);
+    }
+  }
 </script>
 
-<!-- Scroll to Top Button -->
-{#if showScrollTop}
-  <button
-    class="scroll-top-btn group"
-    on:click={scrollToTop}
-    in:scale={{ duration: 300, easing: bounceOut }}
-    out:scale={{ duration: 200 }}
-  >
-    <ArrowUp class="w-5 h-5 group-hover:-translate-y-0.5 transition-transform duration-200" />
-  </button>
-{/if}
-
-<!-- Main Footer -->
-<footer class="bg-gray-100 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
-  {#if mounted}
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      
-      <!-- Main Footer Content -->
-      <div class="py-16">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8">
-          
-          <!-- Brand Section -->
-          <div 
-            class="lg:col-span-2 space-y-6"
-            in:fly={{ y: 30, duration: 600, delay: 100, easing: quartOut }}
-          >
-            <!-- Logo -->
-            <div class="flex items-center space-x-3">
-              <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500 to-rose-600 shadow-sm">
-                <Sparkles class="w-6 h-6 text-white" strokeWidth={2.5} />
-              </div>
-              <div>
-                <h3 class="text-xl font-bold bg-gradient-to-r from-rose-600 to-rose-500 bg-clip-text text-transparent">FocusFlow</h3>
-                <p class="text-xs text-gray-500 dark:text-gray-400 -mt-1">Productivity Suite</p>
-              </div>
-            </div>
-            
-            <!-- Description -->
-            <p class="text-gray-600 dark:text-gray-300 leading-relaxed max-w-sm">
-              The ultimate productivity suite that helps you manage tasks, schedule events, 
-              and stay focused on what matters most.
-            </p>
-            
-            <!-- Social Links -->
-            <div class="flex items-center space-x-4">
-              {#each socialLinks as social, i}
-                <a 
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="social-link {social.color}"
-                  in:scale={{ duration: 300, delay: 200 + (i * 100), easing: bounceOut }}
-                >
-                  <svelte:component this={social.icon} class="w-5 h-5" />
-                  <span class="sr-only">{social.name}</span>
-                </a>
-              {/each}
-            </div>
-          </div>
-          
-          <!-- Product Links -->
-          <div 
-            class="space-y-4"
-            in:fly={{ y: 30, duration: 600, delay: 200, easing: quartOut }}
-          >
-            <h4 class="footer-heading">Product</h4>
-            <ul class="space-y-3">
-              {#each footerLinks.product as link, i}
-                <li in:fly={{ x: -10, duration: 300, delay: 300 + (i * 50), easing: quartOut }}>
-                  <a href={link.href} class="footer-link">
-                    {link.name}
-                  </a>
-                </li>
-              {/each}
-            </ul>
-          </div>
-          
-          <!-- Company Links -->
-          <div 
-            class="space-y-4"
-            in:fly={{ y: 30, duration: 600, delay: 250, easing: quartOut }}
-          >
-            <h4 class="footer-heading">Company</h4>
-            <ul class="space-y-3">
-              {#each footerLinks.company as link, i}
-                <li in:fly={{ x: -10, duration: 300, delay: 350 + (i * 50), easing: quartOut }}>
-                  <a href={link.href} class="footer-link">
-                    {link.name}
-                  </a>
-                </li>
-              {/each}
-            </ul>
-          </div>
-          
-          <!-- Support Links -->
-          <div 
-            class="space-y-4"
-            in:fly={{ y: 30, duration: 600, delay: 300, easing: quartOut }}
-          >
-            <h4 class="footer-heading">Support</h4>
-            <ul class="space-y-3">
-              {#each footerLinks.support as link, i}
-                <li in:fly={{ x: -10, duration: 300, delay: 400 + (i * 50), easing: quartOut }}>
-                  <a href={link.href} class="footer-link footer-external">
-                    <span>{link.name}</span>
-                    {#if link.href.startsWith('http')}
-                      <ExternalLink class="w-3 h-3 opacity-50" />
-                    {/if}
-                  </a>
-                </li>
-              {/each}
-            </ul>
-          </div>
-          
-          <!-- Legal Links -->
-          <div 
-            class="space-y-4"
-            in:fly={{ y: 30, duration: 600, delay: 350, easing: quartOut }}
-          >
-            <h4 class="footer-heading">Legal</h4>
-            <ul class="space-y-3">
-              {#each footerLinks.legal as link, i}
-                <li in:fly={{ x: -10, duration: 300, delay: 450 + (i * 50), easing: quartOut }}>
-                  <a href={link.href} class="footer-link">
-                    {link.name}
-                  </a>
-                </li>
-              {/each}
-            </ul>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Newsletter Section -->
-      <div 
-        class="py-8 border-t border-gray-200 dark:border-gray-700"
-        in:fade={{ duration: 600, delay: 600 }}
-      >
-        <div class="max-w-md mx-auto text-center space-y-4">
-          <h4 class="text-lg font-semibold text-gray-900 dark:text-white">
-            Stay updated
-          </h4>
-          <p class="text-gray-600 dark:text-gray-300 text-sm">
-            Get the latest productivity tips and product updates delivered to your inbox.
+<footer class="footer">
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
+      <!-- Company Info & Newsletter -->
+      <div class="lg:col-span-2 space-y-6">
+        <div>
+          <h2 class="text-2xl font-bold text-gradient-rose mb-4">FocusFlow</h2>
+          <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed max-w-md">
+            Streamline your productivity with intelligent task management, seamless calendar integration, 
+            and smart reminders that keep you focused on what matters most.
           </p>
-          <div class="flex space-x-2">
-            <input 
-              type="email" 
+        </div>
+        
+        <!-- Newsletter Signup -->
+        <div>
+          <h3 class="footer-heading">Stay Updated</h3>
+          <p class="text-gray-600 dark:text-gray-300 text-sm mb-4">
+            Get the latest features and productivity tips delivered to your inbox.
+          </p>
+          
+          <form on:submit={handleNewsletterSubmit} class="flex gap-3">
+            <input
+              type="email"
+              bind:value={email}
               placeholder="Enter your email"
               class="newsletter-input"
+              required
+              disabled={isSubmitting}
             />
-            <button class="newsletter-btn">
-              Subscribe
+            <button
+              type="submit"
+              class="newsletter-btn"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Subscribing...' : 'Subscribe'}
             </button>
-          </div>
+          </form>
+          
+          {#if submitMessage}
+            <p 
+              class="text-sm mt-2 {submitMessage.includes('Thank you') ? 'text-green-600' : 'text-red-600'}"
+              transition:fly={{ y: -10, duration: 300, easing: quintOut }}
+            >
+              {submitMessage}
+            </p>
+          {/if}
         </div>
       </div>
       
-      <!-- Bottom Bar -->
-      <div 
-        class="py-6 border-t border-gray-200 dark:border-gray-700"
-        in:fly={{ y: 20, duration: 600, delay: 700, easing: quartOut }}
-      >
-        <div class="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
-          <div class="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
-            <span>© 2024 FocusFlow. All rights reserved.</span>
-            <span class="hidden md:inline">•</span>
-            <span class="hidden md:inline">Made with</span>
-            <Heart class="hidden md:inline w-4 h-4 text-rose-500 fill-current animate-pulse" />
-            <span class="hidden md:inline">for productivity enthusiasts</span>
+      <!-- Company Links -->
+      <div>
+        <h3 class="footer-heading">Company</h3>
+        <ul class="space-y-3">
+          {#each companyLinks as link}
+            <li>
+              <a href={link.href} class="footer-link">
+                {link.name}
+              </a>
+            </li>
+          {/each}
+        </ul>
+      </div>
+      
+      <!-- Product Links -->
+      <div>
+        <h3 class="footer-heading">Product</h3>
+        <ul class="space-y-3">
+          {#each productLinks as link}
+            <li>
+              <a href={link.href} class="footer-link">
+                {link.name}
+              </a>
+            </li>
+          {/each}
+        </ul>
+      </div>
+      
+      <!-- Support Links -->
+      <div>
+        <h3 class="footer-heading">Support</h3>
+        <ul class="space-y-3">
+          {#each supportLinks as link}
+            <li>
+              <a href={link.href} class="footer-link">
+                {link.name}
+              </a>
+            </li>
+          {/each}
+        </ul>
+      </div>
+    </div>
+    
+    <!-- Bottom Section -->
+    <div class="mt-12 pt-8 border-t border-rose-200/20 dark:border-rose-800/20">
+      <div class="flex flex-col lg:flex-row justify-between items-center gap-6">
+        <!-- Legal Links & Copyright -->
+        <div class="flex flex-col sm:flex-row items-center gap-4 text-sm">
+          <div class="flex items-center gap-4">
+            {#each legalLinks as link}
+              <a href={link.href} class="footer-link">
+                {link.name}
+              </a>
+            {/each}
           </div>
-          
-          <div class="flex items-center space-x-6 text-sm">
-            <div class="flex items-center space-x-2 text-gray-500 dark:text-gray-400">
-              <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span>All systems operational</span>
-            </div>
-            <div class="text-gray-500 dark:text-gray-400">
-              Version 2.1.0
-            </div>
+          <div class="text-gray-500 dark:text-gray-400">
+            © {currentYear} FocusFlow. All rights reserved.
           </div>
+        </div>
+        
+        <!-- Social Links -->
+        <div class="flex items-center gap-4">
+          <span class="text-sm text-gray-600 dark:text-gray-300 mr-2">Follow us:</span>
+          {#each socialLinks as social}
+            <a
+              href={social.href}
+              class="social-link"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={social.name}
+            >
+              <span class="text-lg">{social.icon}</span>
+            </a>
+          {/each}
         </div>
       </div>
     </div>
-  {/if}
+  </div>
 </footer>
-
-<style>
-
-</style>
