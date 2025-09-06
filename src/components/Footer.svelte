@@ -1,195 +1,263 @@
 <script lang="ts">
-  import { fly } from 'svelte/transition';
-  import { quintOut } from 'svelte/easing';
+  import { databases } from '$lib/appwrite';
+  import { ID } from 'appwrite';
   
   let email = '';
+  let subscribeToNewsletter = false;
   let isSubmitting = false;
   let submitMessage = '';
+  let submitSuccess = false;
+  let emailError = '';
   
-  const currentYear = new Date().getFullYear();
+  const DATABASE_ID = 'focusflow-db';
+  const NEWSLETTER_COLLECTION_ID = 'newsletter_subscribers';
   
-  const companyLinks = [
-    { name: 'About', href: '/about' },
-    { name: 'Careers', href: '/careers' },
-    { name: 'Contact', href: '/contact' },
-    { name: 'Blog', href: '/blog' }
-  ];
+  function validateEmail(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
   
-  const productLinks = [
-    { name: 'Features', href: '/features' },
-    { name: 'Pricing', href: '/pricing' },
-    { name: 'Integrations', href: '/integrations' },
-    { name: 'API', href: '/api' }
-  ];
+  function showEmailError() {
+    if (!email) {
+      emailError = 'Email is required';
+      return false;
+    }
+    if (!validateEmail(email)) {
+      emailError = 'Enter an email address like example@mysite.com';
+      return false;
+    }
+    emailError = '';
+    return true;
+  }
   
-  const supportLinks = [
-    { name: 'Help Center', href: '/help' },
-    { name: 'Documentation', href: '/docs' },
-    { name: 'Community', href: '/community' },
-    { name: 'Status', href: '/status' }
-  ];
-  
-  const legalLinks = [
-    { name: 'Privacy Policy', href: '/privacy' },
-    { name: 'Terms of Service', href: '/terms' },
-    { name: 'Cookie Policy', href: '/cookies' }
-  ];
-  
-  const socialLinks = [
-    { name: 'Twitter', href: 'https://twitter.com', icon: '🐦' },
-    { name: 'LinkedIn', href: 'https://linkedin.com', icon: '💼' },
-    { name: 'GitHub', href: 'https://github.com', icon: '💻' },
-    { name: 'Discord', href: 'https://discord.com', icon: '💬' }
-  ];
-  
-  async function handleNewsletterSubmit(event: Event) {
+  async function handleSubmit(event: Event) {
     event.preventDefault();
     
-    if (!email || isSubmitting) return;
+    if (!showEmailError() || isSubmitting) return;
+    
+    if (!subscribeToNewsletter) {
+      submitMessage = 'Please confirm your subscription to the newsletter';
+      submitSuccess = false;
+      return;
+    }
     
     isSubmitting = true;
+    submitMessage = '';
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      submitMessage = 'Thank you for subscribing!';
+      // Create newsletter subscription in Appwrite
+      await databases.createDocument(
+        DATABASE_ID,
+        NEWSLETTER_COLLECTION_ID,
+        ID.unique(),
+        {
+          email: email.toLowerCase().trim(),
+          subscribedAt: new Date().toISOString(),
+          isActive: true,
+          source: 'footer_signup'
+        }
+      );
+      
+      submitMessage = 'Thank you for subscribing to our newsletter!';
+      submitSuccess = true;
       email = '';
-    } catch (error) {
-      submitMessage = 'Something went wrong. Please try again.';
+      subscribeToNewsletter = false;
+      
+    } catch (error: any) {
+      console.error('Newsletter subscription error:', error);
+      
+      if (error.code === 409) {
+        submitMessage = 'This email is already subscribed to our newsletter.';
+        submitSuccess = false;
+      } else {
+        submitMessage = 'Something went wrong. Please try again later.';
+        submitSuccess = false;
+      }
     } finally {
       isSubmitting = false;
+      
+      // Clear message after 5 seconds
       setTimeout(() => {
         submitMessage = '';
-      }, 3000);
+        submitSuccess = false;
+      }, 5000);
     }
+  }
+  
+  // Clear email error when user types
+  $: if (email) {
+    emailError = '';
   }
 </script>
 
-<footer class="footer">
-  <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
-      <!-- Company Info & Newsletter -->
-      <div class="lg:col-span-2 space-y-6">
-        <div>
-          <h2 class="text-2xl font-bold text-gradient-rose mb-4">FocusFlow</h2>
-          <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed max-w-md">
-            Streamline your productivity with intelligent task management, seamless calendar integration, 
-            and smart reminders that keep you focused on what matters most.
-          </p>
+<footer class="bg-[#81a0f7] font-display">
+  <div class="container mx-auto px-4 py-12">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+      <!-- Newsletter Section -->
+      <div class="flex flex-col gap-6">
+        <div class="text-[2rem] font-bold text-[#303030] font-display max-w-[30.25rem] leading-tight">
+          Stay Ahead in a Rapidly Changing World
         </div>
         
-        <!-- Newsletter Signup -->
-        <div>
-          <h3 class="footer-heading">Stay Updated</h3>
-          <p class="text-gray-600 dark:text-gray-300 text-sm mb-4">
-            Get the latest features and productivity tips delivered to your inbox.
-          </p>
+        <div class="flex flex-col gap-4 max-w-[28.25rem]">
+          <p class="text-[#303030] text-[1.5rem] font-medium">Sign up for our newsletter</p>
           
-          <form on:submit={handleNewsletterSubmit} class="flex gap-3">
-            <input
-              type="email"
-              bind:value={email}
-              placeholder="Enter your email"
-              class="newsletter-input"
-              required
-              disabled={isSubmitting}
-            />
+          <form on:submit={handleSubmit} class="flex flex-col gap-4">
+            <!-- Email Input -->
+            <div class="flex flex-col gap-2">
+              <label for="newsletter-email" class="text-[#303030] font-medium">
+                Email <span class="text-red-600">*</span>
+              </label>
+              
+              <input
+                id="newsletter-email"
+                type="email"
+                bind:value={email}
+                on:blur={showEmailError}
+                placeholder="Enter your email address"
+                class="px-4 py-3 border-3 border-[#303030] bg-transparent text-[#303030] placeholder-[#555] font-medium focus:outline-none focus:border-[#220088] transition-colors duration-200"
+                class:border-red-500={emailError}
+                disabled={isSubmitting}
+                required
+              />
+              
+              {#if emailError}
+                <div class="flex items-center gap-2 text-red-600 text-sm">
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                  </svg>
+                  {emailError}
+                </div>
+              {/if}
+            </div>
+            
+            <!-- Checkbox -->
+            <div class="flex items-start gap-3">
+              <input
+                id="newsletter-consent"
+                type="checkbox"
+                bind:checked={subscribeToNewsletter}
+                class="mt-1 w-5 h-5 border-2 border-[#303030] bg-transparent focus:ring-[#220088] focus:ring-2"
+                disabled={isSubmitting}
+                required
+              />
+              <label for="newsletter-consent" class="text-[#303030] font-medium leading-relaxed">
+                Yes, subscribe me to your newsletter. <span class="text-red-600">*</span>
+              </label>
+            </div>
+            
+            <!-- Submit Button -->
             <button
               type="submit"
-              class="newsletter-btn"
               disabled={isSubmitting}
+              class="px-8 py-3 border-3 border-[#303030] bg-transparent text-[#303030] font-bold text-lg hover:bg-[#303030] hover:text-[#81a0f7] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed w-fit"
             >
-              {isSubmitting ? 'Subscribing...' : 'Subscribe'}
+              {isSubmitting ? 'Submitting...' : 'Submit'}
             </button>
+            
+            <!-- Success/Error Message -->
+            {#if submitMessage}
+              <div class="flex items-center gap-2 text-sm font-medium" class:text-green-700={submitSuccess} class:text-red-600={!submitSuccess}>
+                {#if submitSuccess}
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                  </svg>
+                {:else}
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                  </svg>
+                {/if}
+                {submitMessage}
+              </div>
+            {/if}
           </form>
-          
-          {#if submitMessage}
-            <p 
-              class="text-sm mt-2 {submitMessage.includes('Thank you') ? 'text-green-600' : 'text-red-600'}"
-              transition:fly={{ y: -10, duration: 300, easing: quintOut }}
-            >
-              {submitMessage}
-            </p>
-          {/if}
         </div>
       </div>
       
-      <!-- Company Links -->
-      <div>
-        <h3 class="footer-heading">Company</h3>
-        <ul class="space-y-3">
-          {#each companyLinks as link}
-            <li>
-              <a href={link.href} class="footer-link">
-                {link.name}
-              </a>
-            </li>
-          {/each}
-        </ul>
-      </div>
-      
-      <!-- Product Links -->
-      <div>
-        <h3 class="footer-heading">Product</h3>
-        <ul class="space-y-3">
-          {#each productLinks as link}
-            <li>
-              <a href={link.href} class="footer-link">
-                {link.name}
-              </a>
-            </li>
-          {/each}
-        </ul>
-      </div>
-      
-      <!-- Support Links -->
-      <div>
-        <h3 class="footer-heading">Support</h3>
-        <ul class="space-y-3">
-          {#each supportLinks as link}
-            <li>
-              <a href={link.href} class="footer-link">
-                {link.name}
-              </a>
-            </li>
-          {/each}
-        </ul>
-      </div>
-    </div>
-    
-    <!-- Bottom Section -->
-    <div class="mt-12 pt-8 border-t border-rose-200/20 dark:border-rose-800/20">
-      <div class="flex flex-col lg:flex-row justify-between items-center gap-6">
-        <!-- Legal Links & Copyright -->
-        <div class="flex flex-col sm:flex-row items-center gap-4 text-sm">
-          <div class="flex items-center gap-4">
-            {#each legalLinks as link}
-              <a href={link.href} class="footer-link">
-                {link.name}
-              </a>
-            {/each}
-          </div>
-          <div class="text-gray-500 dark:text-gray-400">
-            © {currentYear} FocusFlow. All rights reserved.
-          </div>
-        </div>
+      <!-- Contact Section -->
+      <div class="flex flex-col gap-6">
+        <h2 class="text-[2rem] font-bold text-[#303030] font-display">
+          Contact Us
+        </h2>
         
-        <!-- Social Links -->
-        <div class="flex items-center gap-4">
-          <span class="text-sm text-gray-600 dark:text-gray-300 mr-2">Follow us:</span>
-          {#each socialLinks as social}
-            <a
-              href={social.href}
-              class="social-link"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={social.name}
-            >
-              <span class="text-lg">{social.icon}</span>
+        <div class="flex flex-col gap-4 text-[#303030]">
+          <div class="flex flex-col gap-2">
+            <p class="text-lg font-medium">Email us at:</p>
+            <a href="mailto:info@focusflow.com" class="text-lg underline hover:text-[#220088] transition-colors duration-200">
+              info@focusflow.com
             </a>
-          {/each}
+          </div>
+          
+          <div class="flex flex-col gap-2">
+            <p class="text-lg font-medium">Visit our 
+              <a href="https://focusflow.com" class="underline hover:text-[#220088] transition-colors duration-200">
+                website
+              </a>
+            </p>
+          </div>
+          
+          <div class="flex flex-col gap-1">
+            <p class="text-lg font-medium">Our Office:</p>
+            <p class="text-lg">Terry Francine Street</p>
+            <p class="text-lg">San Francisco, CA 94158</p>
+          </div>
+          
+          <!-- Social Media Icons -->
+          <div class="flex gap-4 mt-4">
+            <a href="#" class="text-[#303030] hover:text-[#220088] transition-colors duration-200" aria-label="Facebook">
+              <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              </svg>
+            </a>
+            
+            <a href="#" class="text-[#303030] hover:text-[#220088] transition-colors duration-200" aria-label="LinkedIn">
+              <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+              </svg>
+            </a>
+            
+            <a href="#" class="text-[#303030] hover:text-[#220088] transition-colors duration-200" aria-label="Twitter">
+              <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+              </svg>
+            </a>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </footer>
+
+<style>
+  /* Custom checkbox styling */
+  input[type="checkbox"] {
+    appearance: none;
+    background-color: transparent;
+    border: 2px solid #303030;
+    border-radius: 2px;
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+  }
+  
+  input[type="checkbox"]:checked {
+    background-color: #303030;
+    border-color: #303030;
+  }
+  
+  input[type="checkbox"]:checked::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #81a0f7;
+    font-size: 12px;
+    font-weight: bold;
+  }
+  
+  input[type="checkbox"]:focus {
+    outline: 2px solid #220088;
+    outline-offset: 2px;
+  }
+</style>

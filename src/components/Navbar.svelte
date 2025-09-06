@@ -75,7 +75,7 @@
     
     <!-- Desktop Navigation -->
     <div class="hidden md:flex gap-4">
-      <div class="flex gap-4 text-[#303030] font-bold">
+      <div class="flex gap-4 text-[#303030] font-bold justify-center items-center">
         {#each navLinks as link}
           <a href={link.href} class="hover:text-[#65318E] transition-colors duration-200">
             {link.label}
@@ -144,23 +144,21 @@
     </div>
     
     <!-- Mobile Menu Button -->
-    <div class="md:hidden mobile-menu-container">
-      <button 
-        on:click={toggleMobileMenu}
-        class="text-[#303030] p-2 flex items-center justify-center w-10 h-10 rounded-md hover:bg-[#d0d0d0] transition-colors duration-200"
-        aria-label="Toggle mobile menu"
-      >
-        {#if isMobileMenuOpen}
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        {:else}
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width={2} d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-        {/if}
-      </button>
-    </div>
+    <button 
+      on:click|stopPropagation={toggleMobileMenu}
+      class="md:hidden text-[#303030] p-3 -m-1 flex items-center justify-center min-w-[44px] min-h-[44px] rounded-md hover:bg-[#d0d0d0] transition-colors duration-200 mobile-menu-container"
+      aria-label="Toggle mobile menu"
+    >
+      {#if isMobileMenuOpen}
+        <svg class="w-6 h-6 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width={2} d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      {:else}
+        <svg class="w-6 h-6 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width={2} d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      {/if}
+    </button>
   </div>
   
   <!-- Mobile Menu Overlay -->
@@ -249,6 +247,14 @@
           >
             Settings
           </a>
+        {:else}
+          <hr class="my-4 mx-6 border-[#d0d0d0]" />
+          <button 
+            on:click={handleSignIn}
+            class="block w-full text-left px-6 py-4 text-[#303030] font-bold text-lg hover:bg-[#d0d0d0] transition-colors duration-200"
+          >
+            Sign In
+          </button>
         {/if}
       </div>
       
