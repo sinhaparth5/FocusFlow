@@ -1,7 +1,6 @@
 import { writable } from 'svelte/store';
 import { browser } from '$app/environment';
 import { account } from '$lib/appwrite';
-import type { Models } from 'appwrite';
 
 export interface User {
   $id: string;

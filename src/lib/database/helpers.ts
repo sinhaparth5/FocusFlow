@@ -1,6 +1,3 @@
-// src/lib/database/helpers.ts
-
-import { databases } from '$lib/appwrite';
 import { ID, Permission, Role, Query } from 'appwrite';
 import type { Models } from 'appwrite';
 import type { 
