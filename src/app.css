@@ -126,3 +126,97 @@ body {
   font-family: var(--font-display);
   font-weight: 400;
 }
+/* Apple device specific fixes */
+@supports (-webkit-appearance: none) {
+  input, button, select, textarea {
+    -webkit-appearance: none !important;
+  }
+  
+  input[type="search"] {
+    -webkit-appearance: none !important;
+  }
+  
+  input[type="checkbox"], input[type="radio"] {
+    -webkit-appearance: none !important;
+    appearance: none !important;
+  }
+  
+  button {
+    -webkit-appearance: none !important;
+  }
+}
+
+/* iOS Safari specific fixes */
+@media screen and (-webkit-min-device-pixel-ratio: 2) {
+  * {
+    -webkit-transform: translate3d(0, 0, 0);
+    -webkit-backface-visibility: hidden;
+    -webkit-perspective: 1000;
+  }
+}
+
+/* Fix for iOS Safari input zoom */
+@media screen and (max-width: 768px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="search"],
+  input[type="tel"],
+  input[type="url"],
+  textarea,
+  select {
+    font-size: 16px !important;
+    -webkit-appearance: none;
+    -webkit-border-radius: 0;
+  }
+}
+
+/* Fix for Safari's 100vh issue */
+.min-h-screen {
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+}
+
+/* Apple device specific overrides */
+.apple-device * {
+  -webkit-appearance: none !important;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+.apple-device input,
+.apple-device textarea,
+.apple-device button,
+.apple-device select {
+  -webkit-appearance: none !important;
+  -webkit-border-radius: 0 !important;
+  border-radius: 0 !important;
+}
+
+.apple-device input[type="checkbox"],
+.apple-device input[type="radio"] {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+}
+
+/* Force hardware acceleration on Apple devices */
+.apple-device .transition-all,
+.apple-device .transition-colors,
+.apple-device .transition-transform {
+  -webkit-transform: translate3d(0, 0, 0);
+  -webkit-backface-visibility: hidden;
+  will-change: transform;
+}
+
+/* Force style recalculation for Apple devices */
+.apple-device {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Fix input styling on iOS */
+input:not([type="checkbox"]):not([type="radio"]) {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
