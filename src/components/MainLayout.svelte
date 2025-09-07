@@ -1,6 +1,7 @@
 <script lang="ts">
   import Navbar from './Navbar.svelte';
   import Footer from './Footer.svelte';
+  import Hero from './Sections/Hero.svelte';
   import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
@@ -38,8 +39,11 @@
 <div class="min-h-screen flex flex-col bg-gradient-to-br from-rose-50/30 via-white to-rose-50/20 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
   <Navbar />
   
-  <main class="flex-1 {fullWidth ? '' : 'container mx-auto px-4 sm:px-6 lg:px-8 py-8'}">
-    <slot />
+  <main class="bg-[#dbdbdb]">
+    <div class="flex-1 bg-[#dbdbdb] {fullWidth ? '' : 'container mx-auto px-4 sm:px-6 lg:px-8 py-8'}">
+      <Hero />
+      <slot />
+    </div>
   </main>
   
   <Footer />
