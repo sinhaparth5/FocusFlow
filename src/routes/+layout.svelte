@@ -6,12 +6,10 @@
   import { onMount } from 'svelte';
   import { page } from '$app/stores';
   
-  // Initialize auth on app load
   onMount(() => {
     authStore.init();
   });
   
-  // Determine if scroll-to-top button should show
   $: showScrollTop = $page.route?.id !== '/';
 </script>
 
